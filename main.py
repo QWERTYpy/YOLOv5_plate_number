@@ -73,7 +73,9 @@ def get_plate_number(result_detection):
                 symbol_result_tmp.append(symbol_result[_])
                 flag_dubl = True
     # print(symbol_result)
-    # print(symbol_result_tmp)
+    print(symbol_result_tmp)
+    sr = symbol_result_tmp
+    print([sr[i+1][0]-sr[i][0] for i in range(len(sr)-1)])
 
     symbol_result = symbol_result_tmp
     plate_num = ""
@@ -83,22 +85,22 @@ def get_plate_number(result_detection):
 
 
 # Загружаем модель
-model = torch.hub.load('ultralytics/yolov5', 'custom', path='model/yolov5s_best.pt', force_reload=True)  # yolov5n - yolov5x6 official model
+model = torch.hub.load('ultralytics/yolov5', 'custom', path='model/yolov5m_best.pt', force_reload=True)  # yolov5n - yolov5x6 official model
 #                                            'custom', 'path/to/best.pt')  # custom model
 
-model.conf = 0.35 # Устанавливаем порог достоверности
+model.conf = 0.25 # Устанавливаем порог достоверности
 path_result = "result"
 path_img = "test_img"
-html_file = hc.head_file(path_result, "test1", "31.10")
+html_file = hc.head_file(path_result, "test1", "07.11")
 
 for filename in os.listdir(path_img):
     # Загружаем изображение
     img = Image.open(f"{path_img}/{filename}")
     # Inference
     results = model(img, size=160)
-    # print(results.pandas().xyxy[0])
+    print(results.pandas().xyxy[0])
     plate_num_detect = get_plate_number(results)
-    # print(plate_num_detect)
+    print(plate_num_detect)
 
     # results.show()
     # input(">>>")
