@@ -2,6 +2,8 @@ from yolov5 import YOLOv5 # Подключаем пакет для работы 
 import numpy
 import cv2
 import os
+from sklearn.cluster import KMeans
+from collections import Counter
 
 def result_model(images):
     """
@@ -12,7 +14,7 @@ def result_model(images):
 
     # Получаем рузультат детекции
     results = yolov5.predict(images, size=640)
-    results.show()
+    # results.show()
     # разделяем результаты
     predictions = results.pred[0]
 
@@ -71,17 +73,36 @@ def result_detection(images_path, boxes, scores, categories, boxes_plate, scores
         x1,y1,x2,y2 = boxes[ind]
         img1 = img[y1:y2, x1:x2]
         cv2.imshow("1", img1)
+        """
+        Для вычисления среднего цвета по изрбражению
+        yh =img1.shape[0]
+        xh = img1.shape[1]
+        print(img1.shape)
+        img_tmp = img1[20:yh-20,20:xh-20]
+        cv2.imshow("2", img_tmp)
+        colors = numpy.unique(img1.reshape(-1, img1.shape[2]), axis=0)
+        color = numpy.flip(colors.mean(axis=0, dtype=numpy.float64).astype(int)).tolist()
+        print(color)
+        """
         if ind in conformity_list[1]:
             ind_plate = conformity_list[1].index(ind)
             x1, y1, x2, y2 = boxes_plate[conformity_list[0][ind_plate]]
             print(f"Обнаружен номер")
             img2 = img[y1:y2, x1:x2]
-            cv2.imshow("2", img2)
+            #cv2.imshow("2", img2)
         cv2.waitKey(0)
 
 
+def get_dominant_color(image, k=4):
+    image = image.reshape((image.shape[0] * image.shape[1], 3))
+    clt = KMeans(n_clusters=k)
+    labels = clt.fit_predict(image)
+    label_counts = Counter(labels)
+    dominant_color = clt.cluster_centers_[label_counts.most_common(1)[0][0]]
+    return list(dominant_color)
+
 # Указываем путь к обученной модели
-model_path = "model/yolov5m_car.pt"
+model_path = "model/yolov5m_car_best.pt"
 images_path = "img_cl"
 device = "cpu"  # "cuda:0"  or "cpu"
 class_name = ["Фура", "Бус", "Легковая", "Номер", "Спецтехника", "Грузовик"]
