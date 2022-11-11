@@ -2,7 +2,6 @@ from yolov5 import YOLOv5 # Подключаем пакет для работы 
 import numpy
 import cv2
 
-
 class CarYOLO:
     def __init__(self):
         # Указываем путь к обученной модели
@@ -70,13 +69,18 @@ class CarYOLO:
                     conformity_list[1].append(__)
         return conformity_list
 
-    def result_detection(self, images_path, boxes, scores, categories, boxes_plate, scores_plate, conformity_list):
+    def result_detection(self, images_path, folder_path, boxes, scores, categories, boxes_plate, scores_plate, conformity_list):
         img = cv2.imread(images_path)
+        detect_list = []
         for ind in range(len(boxes)):
-            print(f"Обнаружено транспортное средство: {self.class_name[categories[ind]]}")
+            # print(f"Обнаружено транспортное средство: {self.class_name[categories[ind]]}")
             x1, y1, x2, y2 = boxes[ind]
             img1 = img[y1:y2, x1:x2]
-            cv2.imshow("1", img1)
+            # cv2.imshow("1", img1)
+            *_, img_name = images_path.split('/')
+            img_name = img_name[:8]
+            *_, fld_name = folder_path.split('/')
+            cv2.imwrite(f"{folder_path}/{img_name}_car_{ind}.jpg", img1)
             """
             Для вычисления среднего цвета по изрбражению
             yh =img1.shape[0]
@@ -90,7 +94,17 @@ class CarYOLO:
             if ind in conformity_list[1]:
                 ind_plate = conformity_list[1].index(ind)
                 x1, y1, x2, y2 = boxes_plate[conformity_list[0][ind_plate]]
-                print(f"Обнаружен номер")
+                # print(f"Обнаружен номер")
                 img2 = img[y1:y2, x1:x2]
                 # cv2.imshow("2", img2)
-            cv2.waitKey(0)
+                cv2.imwrite(f"{folder_path}/{img_name}_plate_{ind_plate}.jpg", img2)
+                detect_list.append([fld_name, img_name, self.class_name[categories[ind]],"NULL",
+                                  f"{folder_path}/{img_name}_plate_{ind_plate}.jpg",
+                                   f"{folder_path}/{img_name}_car_{ind}.jpg" ])
+            else:
+                detect_list.append([fld_name, img_name, self.class_name[categories[ind]], "NULL",
+                                    "NULL",
+                                    f"{folder_path}/{img_name}_car_{ind}.jpg"])
+            # cv2.waitKey(0)
+        return detect_list
+
