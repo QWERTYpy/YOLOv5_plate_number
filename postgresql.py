@@ -181,6 +181,24 @@ class PostgessBase:
         self.cursor.execute(insert_query)
         #return self.cursor.fetchall()
 
+    def select_row(self):
+        postgresql_select_query = "select * from public.car_detection where number_img is not NULL and number is NULL"
+        # postgresql_select_query = "select * from public.car_detection where number_img is not NULL and car_img is NULL"
+        self.cursor.execute(postgresql_select_query)
+        return self.cursor.fetchone()
+
+    def select_test(self):
+        postgresql_select_query = "select * from public.car_detection where number is not NULL"
+        # postgresql_select_query = "select * from public.car_detection where number_img is not NULL and car_img is NULL"
+        self.cursor.execute(postgresql_select_query)
+        return self.cursor.fetchall()
+
+    def update_row(self, txt_plate, car_img):
+        # postgresql_select_query = "update public.car_detection set number = NULL where car_img = %s"
+        postgresql_select_query = "update public.car_detection set number = %s where car_img = %s"
+        self.cursor.execute(postgresql_select_query, (txt_plate, car_img))
+        # return self.cursor.fetchone()
+
 
 if __name__ == '__main__':
     bd = PostgessBase()
@@ -189,7 +207,14 @@ if __name__ == '__main__':
     # print(bd.select_date("2022-11-10", "02:00:00","06:00:00"))
     #bd.insert_data(dd)
     # print(bd.time_exists("2022-11-10"))
-    print(bd.del_duplicate())
-
+    # print(bd.del_duplicate())
+    # place, date_photo, time_photo, type_car, number_plate, number_plate_img, car_img = bd.select_row()
+    # print(place, date_photo, time_photo, type_car, number_plate, number_plate_img, car_img)
+    # print(bd.select_row())
+    # print(bd.select_row())
+    # bd.update_row()
+    # bd.mm_date()
+    # print(bd.row())
+    print(bd.select_test())
 
 
