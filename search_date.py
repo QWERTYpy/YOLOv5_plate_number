@@ -2,6 +2,7 @@ import postgresql as pg
 import re
 import datetime
 import html_create as hc
+import html_create_pages as hcp
 
 # Создаем подключение к БД
 bd = pg.PostgessBase()
@@ -30,9 +31,18 @@ for _ in range(len(car_type)):
 input_type = input("Введите номер:")
 
 list_result = bd.select_date(input_date, f"{input_low}:00:00", f"{input_hight}:00:00", car_type[int(input_type)])
+print(f"Найдено {len(list_result)} записей")
 # Создаем файл с отчетом
 html_file = hc.head_file("./", f"{input_date}_{input_low}_{input_hight}", str(input_date))
 for res in list_result:
     hc.bd_str_file(html_file, res)
 hc.end_file(html_file)
+
+
+# row_count = 12
+# str_count = int(len(list_result)/row_count)+1
+# html_file = hcp.head_file("./", f"{input_date}_{input_low}_{input_hight}", str_count)
+# hcp.str_file(html_file, list_result, str_count,row_count)
+# hcp.navigation(html_file, str_count)
+# hcp.end_file(html_file)
 
